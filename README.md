@@ -25,24 +25,14 @@ The statistics screenshot includes sample activity data.
 
 ## Features
 
-- **Daily and weekly statistics.** See your daily total, the focus/rest breakdown with percentages, and seven stacked bars for the week. Weeks run Monday through Sunday.
-- **Explore your activity.** Hover over a day to preview it, click to keep it selected, and click it again to return to Today. Browse previous weeks with the arrow controls.
-- **Flexible timer controls.** Pause either focus or rest and resume with the time remaining. Skip an interval to start the next one.
-- **Persistent local history.** Record elapsed focus and rest time, including intervals stopped before completion.
-- **A simpler settings panel.** General preferences, intervals and sounds are grouped under Settings.
-- **Visible timer states.** The menu bar icon is red during focus, gray during rest and amber while paused.
+- 📊 **Daily and weekly statistics.** See your daily total, the focus/rest breakdown with percentages, and seven stacked bars for the week. Weeks run Monday through Sunday.
+- 🔎 **Explore your activity.** Hover over a day to preview it, click to keep it selected, and click it again to return to Today. Browse previous weeks with the arrow controls.
+- ⏯️ **Flexible timer controls.** Pause either focus or rest and resume with the time remaining. Skip an interval to start the next one.
+- 💾 **Persistent local history.** Record elapsed focus and rest time, including intervals stopped before completion.
+- ⚙️ **A simpler settings panel.** General preferences, intervals and sounds are grouped under Settings.
+- 🍅 **Visible timer states.** The menu bar icon is red during focus, gray during rest and amber while paused.
 
 The original configurable intervals, optional sounds, notifications, launch-at-login preference and global shortcut remain available.
-
-## How time is counted
-
-Total Pomodoro time includes both focus and rest. Paused time is excluded.
-
-Statistics use completed activity segments saved in the log. A running segment contributes to the chart once it ends, is paused, skipped or stopped. Pausing closes the current segment; resuming starts another.
-
-Segments crossing midnight are split between the two local days. Dates use the Mac's time zone. Displayed minutes are rounded consistently so the daily breakdowns and weekly total add up.
-
-Opening Stats resets the view to Today and the current week. Selected days stay highlighted while other days can be previewed with the pointer.
 
 ## Build and run
 
@@ -62,42 +52,17 @@ The project uses Swift, SwiftUI and AppKit. Install full Xcode and complete its 
 
 The app target declares macOS 11 or later. Explicit Stats keyboard focus handling uses macOS 14 APIs; keyboard behavior on earlier versions remains unverified.
 
-A prepared public binary release is pending. The build product is currently named `TomatoBar.app`.
+A prepared public binary release is pending. The build product is named `TomatoBar-Stats.app`.
 
 ## Activity log
 
-The app writes one JSON event per line to `Application Support/Pomodoro/TomatoBar.log` inside its sandbox container.
+The app keeps a local history of focus and rest periods, which provides the data for the daily and weekly statistics. Events are saved as one JSON object per line, with a timestamp and a readable local time.
 
-With the repository's default bundle identifier, the path is:
+The log is stored in:
 
 ```text
-~/Library/Containers/com.github.ivoronin.TomatoBar/Data/Library/Application Support/Pomodoro/TomatoBar.log
+~/Library/Containers/com.github.marcribera.TomatoBarStats/Data/Library/Application Support/Pomodoro/TomatoBar.log
 ```
-
-A custom bundle identifier uses a different container. The original app and this fork currently share the default identifier, so use a distinct identifier when configuring a separate development installation.
-
-Events retain the numeric `timestamp` and include a readable `localTime` with its UTC offset. A save failure stops the timer and offers Retry or Quit.
-
-Normal app termination and Mac sleep close active segments. Waking or reopening leaves the timer stopped. Recovery after crashes or abrupt power loss is outside the current scope.
-
-The existing URL action is also supported:
-
-```bash
-open 'tomatobar://startStop'
-```
-
-## UX and accessibility
-
-Stats opens first to make recent activity immediately available. The chart supports pointer previews and keyboard interaction. On macOS 14 or later, Tab and Shift+Tab move focus, Space selects a day, and a thin focus outline distinguishes keyboard focus from the selected day.
-
-Accessibility testing is ongoing. Known follow-up work includes:
-
-- Fixing Tab navigation through Settings controls.
-- Verifying keyboard access to the top timer controls.
-- Testing the interface with VoiceOver and checking contrast across accessibility settings.
-- Verifying Stats keyboard behavior on macOS versions earlier than 14.
-
-Statistics are currently displayed in English. Localization is planned for a later version.
 
 ## Tests
 
@@ -116,7 +81,7 @@ xcodebuild test \
   -parallel-testing-enabled NO
 ```
 
-The latest local validation passed 48 tests.
+The latest local validation passed 49 tests, including URL scheme isolation.
 
 ## Credits and license
 

@@ -1,4 +1,5 @@
-import Foundation
+import AppKit
+import Carbon.HIToolbox
 import XCTest
 
 final class TimerTests: XCTestCase {
@@ -12,6 +13,34 @@ final class TimerTests: XCTestCase {
 
     override func tearDownWithError() throws {
         try FileManager.default.removeItem(at: directory)
+    }
+
+    func testURLControlUsesTheForkSchemeAndIgnoresTheOriginal() throws {
+        let log = TBLogger(fileURL: url)
+        let timer = TBTimer(log: log, registerSystemHandlers: false)
+        defer { timer.finishActiveInterval() }
+
+        func send(_ value: String) {
+            let event = NSAppleEventDescriptor(
+                eventClass: AEEventClass(kInternetEventClass),
+                eventID: AEEventID(kAEGetURL),
+                targetDescriptor: nil,
+                returnID: AEReturnID(kAutoGenerateReturnID),
+                transactionID: AETransactionID(kAnyTransactionID)
+            )
+            event.setParam(NSAppleEventDescriptor(string: value), forKeyword: AEKeyword(keyDirectObject))
+            timer.handleGetURLEvent(event, withReplyEvent: NSAppleEventDescriptor.null())
+        }
+
+        send("tomatobar://startStop")
+        XCTAssertNil(timer.timer)
+        send("tomatobar-stats://startStop")
+        XCTAssertNotNil(timer.timer)
+        send("tomatobar://startStop")
+        XCTAssertNotNil(timer.timer)
+        send("TOMATOBAR-STATS://STARTSTOP")
+        XCTAssertNil(timer.timer)
+        XCTAssertEqual(try TBHistory.read(from: url).intervals.count, 1)
     }
 
     func testStartAndStopPersistOneCompletedFocus() throws {
